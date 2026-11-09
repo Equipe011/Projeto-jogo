@@ -1,19 +1,244 @@
-btnIniciar.addEventListener("click", iniciaJogo);
 
+import { aleatorio, nome } from './sorteio.js';
+import { perguntas } from './questionario.js';
+
+// Elementos do HTML
+const telaInicial = document.querySelector(".tela-inicial");
+const caixaPerguntas = document.querySelector(".caixa-perguntas");
+const caixaAlternativas = document.querySelector(".caixa-alternativas");
+const caixaResultado = document.querySelector(".caixa-resultado");
+const textoResultado = document.querySelector(".texto-resultado");
+const tituloResultado = document.querySelector(".titulo-resultado");
+
+const botaoIniciar = document.querySelector(".iniciar-btn");
+const botaoJogarNovamente = document.querySelector(".novamente-btn");
+
+const botaoCreditos = document.querySelector(".creditos-btn");
+const telaCreditos = document.querySelector(".tela-creditos");
+const botaoVoltarInicio = document.querySelector(".voltar-inicio-btn");
+
+// Estado da partida
+let atual = 0;
+let historiaFinal = "";
+let faseDaPartida = "inicio";
+
+// Eventos registrados uma única vez
+botaoIniciar.addEventListener("click", iniciaJogo);
+botaoJogarNovamente.addEventListener("click", reiniciaJogo);
+botaoCreditos.addEventListener("click", mostraCreditos);
+botaoVoltarInicio.addEventListener("click", reiniciaJogo);
+
+// Inicia uma partida
 function iniciaJogo() {
-    atual = 0;
-    historiaFinal = "";
-    nome = aleatorio(nomes);
-    caixaInicial.style.display = "none";
-    caixaResultado.style.display = "none";
+    reiniciaJogo();
+
+    faseDaPartida = "jogando";
+
+    telaInicial.style.display = "none";
+    caixaPerguntas.classList.add("mostrar");
+    caixaAlternativas.classList.add("mostrar");
+
     mostraPergunta();
 }
 
-// Função para voltar para a tela inicial com o texto de introdução
-function voltarParaTelaInicial() {
-    caixaResultado.style.display = "none";
-    caixaInicial.style.display = "block";
+// Reinicia completamente a partida
+function reiniciaJogo() {
+    atual = 0;
+    historiaFinal = "";
+    faseDaPartida = "inicio";
+
+    caixaPerguntas.textContent = "";
+    caixaAlternativas.replaceChildren();
+
+    tituloResultado.textContent = "";
+    textoResultado.textContent = "";
+
+    telaInicial.style.display = "block";
+
+    caixaPerguntas.classList.remove("mostrar");
+    caixaAlternativas.classList.remove("mostrar");
+    caixaResultado.classList.remove("mostrar");
+
+    telaCreditos.style.display = "none";
+    botaoCreditos.style.display = "none";
+
+    botaoJogarNovamente.style.display = "inline-block";
 }
 
-// Altere o evento do botão "Jogar Novamente" para chamar a nova função
-btnJogarNovamente.addEventListener("click", voltarParaTelaInicial);
+// Mostra a pergunta atual
+function mostraPergunta() {
+    const perguntaAtual = perguntas[atual];
+
+    // Verifica se a etapa é um final verdadeiro
+    if (perguntaAtual.final === "vitoria") {
+        mostraVitoria(perguntaAtual.enunciado);
+        return;
+    }
+
+    caixaPerguntas.textContent =
+        perguntaAtual.enunciado.replace(/você/gi, nome);
+
+    caixaAlternativas.replaceChildren();
+
+    for (const alternativa of perguntaAtual.alternativas) {
+        const botao = document.createElement("button");
+
+        botao.type = "button";
+        botao.textContent = alternativa.texto;
+        botao.disabled = alternativa.disponivel === false;
+
+        botao.addEventListener("click", function () {
+            respostaSelecionada(alternativa);
+        });
+
+        caixaAlternativas.appendChild(botao);
+    }
+}
+
+// Processa a alternativa selecionada
+function respostaSelecionada(opcaoSelecionada) {
+
+    // Bloqueia escolhas depois do encerramento
+    if (faseDaPartida !== "jogando") {
+        return;
+    }
+
+    if (opcaoSelecionada.disponivel === false) {
+        return;
+    }
+
+    // Trata a derrota antes de procurar um destino
+    if (opcaoSelecionada.tipo === "gameover") {
+
+        const afirmacao = aleatorio(opcaoSelecionada.afirmacao);
+
+        historiaFinal += afirmacao + " ";
+
+        mostraGameOver(opcaoSelecionada.mensagem);
+        return;
+    }
+
+    const destino = opcaoSelecionada.proxima;
+
+    // Verifica se o destino existe
+    if (
+        !Number.isInteger(destino) ||
+        perguntas[destino] === undefined
+    ) {
+        console.error("Destino inválido:", destino);
+        return;
+    }
+
+    const origem = perguntas[atual];
+    const chegada = perguntas[destino];
+
+    const mudouDeCaminho =
+        origem.caminho !== chegada.caminho;
+
+    // A primeira pergunta pode iniciar qualquer narrativa
+    if (
+        atual !== 0 &&
+        mudouDeCaminho &&
+        opcaoSelecionada.tipo !== "trocar"
+    ) {
+        console.error("Mudança de caminho sem o tipo trocar.");
+        return;
+    }
+
+    // A troca precisa levar a outra narrativa
+    if (
+        opcaoSelecionada.tipo === "trocar" &&
+        !mudouDeCaminho
+    ) {
+        console.error("A troca deve levar a outro caminho.");
+        return;
+    }
+
+    const afirmacao = aleatorio(opcaoSelecionada.afirmacao);
+
+    historiaFinal += afirmacao + " ";
+
+    atual = destino;
+
+    mostraPergunta();
+}
+
+// Tela de derrota
+function mostraGameOver(mensagem) {
+    faseDaPartida = "gameover";
+
+    caixaPerguntas.classList.remove("mostrar");
+    caixaAlternativas.classList.remove("mostrar");
+
+    caixaAlternativas.replaceChildren();
+
+    caixaResultado.classList.add("mostrar");
+
+    tituloResultado.textContent = "GAME OVER";
+
+    textoResultado.textContent =
+        mensagem +
+        "\n\nSuas escolhas nesta tentativa:\n" +
+        historiaFinal;
+
+    botaoJogarNovamente.textContent = "Recomeçar do início";
+    botaoJogarNovamente.style.display = "inline-block";
+
+    botaoCreditos.style.display = "none";
+    telaCreditos.style.display = "none";
+}
+
+// Tela de vitória
+function mostraVitoria(mensagem) {
+
+    // Confere se a posição atual realmente é um final
+    if (
+        faseDaPartida !== "jogando" ||
+        perguntas[atual].final !== "vitoria"
+    ) {
+        return;
+    }
+
+    faseDaPartida = "vitoria";
+
+    caixaPerguntas.classList.remove("mostrar");
+    caixaAlternativas.classList.remove("mostrar");
+
+    caixaAlternativas.replaceChildren();
+
+    caixaResultado.classList.add("mostrar");
+
+    tituloResultado.textContent = "THE END";
+
+    textoResultado.textContent =
+        mensagem +
+        "\n\nSeu percurso nesta partida:\n" +
+        historiaFinal;
+
+    // O jogador segue para os créditos
+    botaoJogarNovamente.style.display = "none";
+    botaoCreditos.style.display = "inline-block";
+
+    telaCreditos.style.display = "none";
+}
+
+// Mostra os créditos somente depois da vitória
+function mostraCreditos() {
+
+    if (faseDaPartida !== "vitoria") {
+        return;
+    }
+
+    faseDaPartida = "creditos";
+
+    telaInicial.style.display = "none";
+
+    caixaPerguntas.classList.remove("mostrar");
+    caixaAlternativas.classList.remove("mostrar");
+    caixaResultado.classList.remove("mostrar");
+
+    telaCreditos.style.display = "block";
+}
+
+// Prepara a introdução ao abrir a página
+reiniciaJogo();
