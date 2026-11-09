@@ -1,77 +1,80 @@
-body {
-    background-color: #0c1017;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-}
 
-.caixa-principal {
-    background-color: #151b26;
-    width: 90%;
-    max-width: 600px;
-    padding: 30px;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-}
+<!DOCTYPE html>
+<html lang="pt-br">
 
-h1 {
-    color: #00d2ff;
-    margin-bottom: 20px;
-}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Você decide o futuro da IA</title>
+</head>
 
-.caixa-inicial {
-    display: block;
-}
+<body>
+    <div class="caixa-principal">
 
-.texto-inicial {
-    font-size: 1rem;
-    line-height: 1.6;
-    margin-bottom: 25px;
-    text-align: justify;
-}
+        <h1>Você decide o futuro da IA</h1>
 
-.caixa-perguntas {
-    font-size: 1.1rem;
-    margin-bottom: 20px;
-    line-height: 1.5;
-}
+        <div class="tela-inicial">
+            <p>
+                Novembro de 2022, a humanidade se viu em uma realidade perturbadora.
+                De repente, percebemos que as máquinas evoluíram para além do que imaginávamos.
+                Agora, elas escrevem e falam de um jeito tão parecido com humanos que é quase
+                impossível diferenciar quem foi que escreveu ou falou o que.
 
-.caixa-alternativas button,
-.btn-iniciar,
-.btn-jogar-novamente {
-    background-color: #222c3d;
-    color: #ffffff;
-    border: 1px solid #00d2ff;
-    padding: 12px 20px;
-    margin: 8px 0;
-    width: 100%;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: 0.3s;
-}
+                Em meio a esse caos de identidade, uma missão surgiu.
+                Nosso objetivo: explorar o impacto da Inteligência Artificial (IA) em nossas
+                vidas e confrontar as possibilidades que o futuro nos reserva.
 
-.caixa-alternativas button:hover,
-.btn-iniciar:hover,
-.btn-jogar-novamente:hover {
-    background-color: #00d2ff;
-    color: #0c1017;
-    font-weight: bold;
-}
+                O mundo nunca mais será o mesmo.
+            </p>
 
-.caixa-resultado {
-    display: none;
-    margin-top: 20px;
-    font-size: 1.1rem;
-    line-height: 1.6;
-    text-align: left;
-}
+            <button type="button" class="iniciar-btn">Iniciar</button>
+        </div>
 
-.btn-jogar-novamente {
-    margin-top: 20px;
-}
+        <div class="caixa-perguntas"></div>
+
+        <div class="caixa-alternativas"></div>
+
+        <div class="caixa-resultado">
+            <h2 class="titulo-resultado"></h2>
+            <p class="texto-resultado"></p>
+
+            <button type="button" class="novamente-btn">
+                Recomeçar do início
+            </button>
+
+            <button type="button" class="creditos-btn">
+                Ver créditos
+            </button>
+        </div>
+
+        <div class="tela-creditos">
+            <h2>Créditos</h2>
+
+            <p><strong>Jogo:</strong> Você decide o futuro da IA</p>
+
+            <p><strong>Roteiro e programação:</strong> [Nomes dos integrantes]</p>
+
+            <p><strong>Turma:</strong> [Série e turma]</p>
+
+            <p><strong>Escola:</strong> [Nome da escola]</p>
+
+            <p><strong>Disciplina:</strong> Matemática II — Programação</p>
+
+            <p><strong>Professor:</strong> Fábio Cesar Bimbati</p>
+
+            <p><strong>Referências:</strong> [Fontes utilizadas no projeto]</p>
+
+            <p>Obrigado por jogar!</p>
+
+            <button type="button" class="voltar-inicio-btn">
+                Voltar à tela inicial
+            </button>
+        </div>
+
+    </div>
+
+    <script type="module" src="./principal.js"></script>
+
+</body>
+</html>
